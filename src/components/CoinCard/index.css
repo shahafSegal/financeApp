@@ -1,0 +1,13 @@
+.coinCard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: black;
+    color: gold;
+    border: 4px solid gold;
+}
+.topTitle{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
