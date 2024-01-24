@@ -15,7 +15,7 @@ export default function CoinCard(props){
        
         <h3>{currCoin.priceUsd} <span style={{color:'greenyellow'}}>$</span></h3>
         {(props.loggedIn)? <button onClick={changeFavourite}>{isFav?"remove from":"add to"}  favourites </button>:
-        <NavLink className="btn btn-primary">register to add favourites</NavLink>
+        <NavLink className="btn btn-primary" to={"/register"}>register to add favourites</NavLink>
             
         }
         

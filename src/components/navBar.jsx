@@ -1,5 +1,3 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import"bootstrap/dist/js/bootstrap.bundle"
 import { Nav,Container, Navbar, Button } from "react-bootstrap";
 import { NavLink} from 'react-router-dom'
 import UserDropDown from "./UserDropDown";
@@ -22,6 +20,9 @@ function NavBar(props){
               </Nav.Link>
               <Nav.Link as={NavLink} to="/favourite" style={activeClass}>
                 Favourite
+              </Nav.Link>
+              <Nav.Link as={NavLink} to="/search" style={activeClass}>
+                Search
               </Nav.Link>
             </Nav>
             <Nav>

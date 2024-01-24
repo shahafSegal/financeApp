@@ -8,7 +8,9 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import NavBar from './components/navBar';
 import "./App.css"
 import FavouriteShow from './pages/FavouriteShow';
-
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle"
+import SearchID from './pages/searchId';
 
 
 function App() {
@@ -163,6 +165,10 @@ function App() {
           <Route path='/favourite' 
           element={<FavouriteShow cCardArr={CoinCardArr} changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}
           />
+          <Route path='/search' element={<SearchID changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}>
+            <Route path=':id' />
+
+          </Route>
           <Route path='/register' element={<UserRegister usrSign={isLoggingIn?userLogin:userSignUp} usrObj={userObj} togle={toggleLogin} isLogin={isLoggingIn}/>}/>
         </Routes>
       </BrowserRouter>
