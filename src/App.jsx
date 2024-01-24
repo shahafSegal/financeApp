@@ -1,7 +1,13 @@
 import { useEffect, useState} from 'react'
 import {requestOptions,db,auth} from '../config/config'
 import GeneralPage from './pages/generalPage';
-import{collection , getDocs, query, setDoc, where, doc} from "firebase/firestore"
+import UserRegister from './pages/UserRegister';
+import{collection , getDoc, setDoc, doc} from "firebase/firestore"
+import{onAuthStateChanged, createUserWithEmailAndPassword,signOut,signInWithEmailAndPassword}from "firebase/auth"
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import NavBar from './components/navBar';
+import "./App.css"
+import FavouriteShow from './pages/FavouriteShow';
 
 
 
@@ -15,42 +21,88 @@ function App() {
 
 
   function changeFav(coinId){
-    console.log(FavouriteArr,coinId,FavouriteArr.includes(coinId))
     if(isIdFav(coinId)){
       const newFavArr= FavouriteArr.filter((favId)=>{return coinId!=favId})
       setFavouriteObj({...FavouriteObj,favouritesId:newFavArr})
     }
     else{
       const newFavObj={...FavouriteObj,favouritesId:[...FavouriteArr,coinId]}
-      console.log(newFavObj)
       setFavouriteObj(newFavObj)
     }
 
+  }
+
+  async function fetchFav() {
+    try {
+      const docData = await getDoc(favRef);
+      console.log(docData.data())
+      setFavouriteObj({...docData.data(),id:docData.id});
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    }
+  }
+  const logOut=()=>{
+    signOut(auth).then(() => {
+      setUserObj({email:'',id:'',error:''})
+    }).catch((error) => {
+      console.log(error)
+    });
+   
+  }
+  const extractErrorType=(errorString)=> {
+    const prefix = "auth/";
+    const suffix = ")";
+    
+    const startIndex = errorString.indexOf(prefix);
+    const endIndex = errorString.indexOf(suffix, startIndex + prefix.length);
+  
+    if (startIndex !== -1 && endIndex !== -1) {
+      return errorString.slice(startIndex + prefix.length, endIndex);
+    } else {
+      // Handle the case where the expected substrings are not found
+      return "";
+    }
+  }
+
+  const userSignUp= (email,pass)=>{
+    console.log(email,pass)
+    
+    createUserWithEmailAndPassword(auth,email,pass)
+      .then((userCredential) => {
+        setUserObj({email:email,id:userCredential.user.uid,error:''})
+      })
+      .catch((error) => {
+        const errorMessage = extractErrorType(error.message);
+        console.log(errorMessage)
+        setUserObj({...userObj,error:errorMessage})
+      });
+  }
+  const userLogin=(email,pass)=>{
+    console.log(email)
+    signInWithEmailAndPassword(auth, email, pass)
+    .then((userCredential) => {
+      setUserObj({email:email,id:userCredential.user.uid,error:''})
+    })
+    .catch((error) => {
+      const errorMessage = extractErrorType(error.message);
+      setUserObj({...userObj,error:errorMessage})
+  });
   }
   
 
   const [CoinCardArr, setCoinCardArr] = useState([])
   const [FavouriteObj, setFavouriteObj] = useState({})
+  const [isLoggingIn,setIsLoggingIn]=useState(true)
+  const toggleLogin=()=>{setIsLoggingIn(!isLoggingIn)}
+  const[userObj,setUserObj]=useState({email:'',id:'',error:''})
+  
   const FavouriteArr=FavouriteObj.favouritesId?[...FavouriteObj.favouritesId]:[];
-  const favRef=collection(db,"favourites")
-  const userId="123"
+  const userId=userObj.id;
+  const favRef=userObj.id?doc(db,"favourites",userId):null;
 
+  
 
   useEffect(()=>{
-    
-    async function fetchFav() {
-      try {
-        const queryRef= await query(favRef,where("userID","==",`${userId}`));
-        const docData = await getDocs(queryRef);
-       
-        const fDoc = docData.docs[0];
-        console.log(fDoc.data())
-        
-        setFavouriteObj({...fDoc.data(),id:fDoc.id});
-      } catch (error) {
-        console.error("Error fetching favorites:", error);
-      }
-    }
 
     function fetchAssetsData(){
       fetch("https://api.coincap.io/v2/assets", requestOptions)
@@ -58,21 +110,26 @@ function App() {
         .then(data => {setCoinCardArr(data.data) })
         .catch(error => console.error('Error:', error));
     }
+    onAuthStateChanged(auth,(user) => {
+      if (user) {
+        console.log(user.uid)
+       setUserObj({email:user.email,id:user.uid,error:''})
+      } else {
+        console.log("not signed")
+      }
+    });
 
     fetchAssetsData()
-    if( userId){
-      fetchFav()
-    }
   },[])
+  useEffect(()=>{if(favRef)fetchFav()},[userObj])
 
   useEffect(()=>{
     async function setFavouriteDb(){
       {
         try{
-          await setDoc(doc(db,"favourites",FavouriteObj.id),
+          await setDoc(doc(db,"favourites",userId),
           {
-            favouritesId:FavouriteArr,
-            userID:userId
+            favouritesId:FavouriteArr
           }
           )
         }catch (error) {
@@ -80,7 +137,7 @@ function App() {
         }
       }
     }
-    if(FavouriteObj.id){
+    if(FavouriteObj.id &&userId==FavouriteObj.id){
       setFavouriteDb()
     }
   }
@@ -94,9 +151,23 @@ function App() {
 
   return (
     
-    <div>
-      <GeneralPage cCardArr={CoinCardArr} changeFav={changeFav} isFavFunc={isIdFav}></GeneralPage>
-    </div>
+    <>
+      <BrowserRouter>
+      <NavBar usrObj={userObj} logOut={logOut}>
+
+      </NavBar>
+        <Routes>
+          <Route path='/' 
+          element={<GeneralPage cCardArr={CoinCardArr} changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}
+          />
+          <Route path='/favourite' 
+          element={<FavouriteShow cCardArr={CoinCardArr} changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}
+          />
+          <Route path='/register' element={<UserRegister usrSign={isLoggingIn?userLogin:userSignUp} usrObj={userObj} togle={toggleLogin} isLogin={isLoggingIn}/>}/>
+        </Routes>
+      </BrowserRouter>
+      
+    </>
     
   )
 }

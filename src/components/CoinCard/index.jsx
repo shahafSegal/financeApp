@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+import{Nav}  from "react-bootstrap"
 import "./index.css"
 export default function CoinCard(props){
     const currCoin=props.coin;
@@ -12,7 +14,11 @@ export default function CoinCard(props){
         </div>
        
         <h3>{currCoin.priceUsd} <span style={{color:'greenyellow'}}>$</span></h3>
-        <button onClick={changeFavourite}>{isFav?"remove from":"add to"}  favourites </button>
+        {(props.loggedIn)? <button onClick={changeFavourite}>{isFav?"remove from":"add to"}  favourites </button>:
+        <NavLink className="btn btn-primary">register to add favourites</NavLink>
+            
+        }
+        
     </div>
     )
     

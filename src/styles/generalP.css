@@ -10,7 +10,7 @@
 }
 .closeCont{
     margin: auto;
-    max-height: 100vh;
+    flex-grow: 1;
     width: fit-content;
     overflow-y: auto;
 
