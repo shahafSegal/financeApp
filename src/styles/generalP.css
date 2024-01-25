@@ -6,11 +6,11 @@
     background-color: gray;
     border: 10px solid gray;
     
-
 }
 .closeCont{
     margin: auto;
     flex-grow: 1;
+    max-height: 95vh;
     width: fit-content;
     overflow-y: auto;
 

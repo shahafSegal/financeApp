@@ -166,8 +166,7 @@ function App() {
           element={<FavouriteShow cCardArr={CoinCardArr} changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}
           />
           <Route path='/search' element={<SearchID changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}>
-            <Route path=':id' />
-
+            <Route path=':id' element={<SearchID changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>} />
           </Route>
           <Route path='/register' element={<UserRegister usrSign={isLoggingIn?userLogin:userSignUp} usrObj={userObj} togle={toggleLogin} isLogin={isLoggingIn}/>}/>
         </Routes>
