@@ -1,15 +1,32 @@
+import { useEffect, useState } from "react";
 import CoinCard from "../components/CoinCard"
 import"../styles/generalP.css"
 import { NavLink } from "react-router-dom";
+import { requestOptions } from "../../config/config";
 
 export default function FavouriteShow(props)  {
-    const CoinCardArr=props.cCardArr;
-    const isFavFunc=props.isFavFunc;
+    const favArr=props.favArr;
+    console.log(favArr)
+    const[FavouriteData,setFavouriteData]=useState([])
+    useEffect(()=>{
+        async function getFData(){
+            try{
+                const response = await fetch(`https://api.coincap.io/v2/assets?ids=${favArr.join(',')}`, requestOptions);
+                const res =await response.json();
+                console.log(res.data)
+                setFavouriteData(res.data)
+            }catch(e){
+                console.log(e)
+            }
+        }
+        getFData()
+        }
+    ,[favArr])
     
     function createCoinCards(){
-        return CoinCardArr.map((newCoin)=>{return isFavFunc(newCoin.id)? <CoinCard 
-        coin={newCoin} changeFav={props.changeFav} isFav={isFavFunc(newCoin.id) } loggedIn={props.loggedIn}>
-        </CoinCard>:<></>
+        return FavouriteData.map((newCoin)=>{return <CoinCard 
+        coin={newCoin} changeFav={props.changeFav} isFav={true} loggedIn={props.loggedIn}>
+        </CoinCard>
         })
     }
 

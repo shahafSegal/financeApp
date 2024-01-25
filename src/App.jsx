@@ -37,7 +37,6 @@ function App() {
   async function fetchFav() {
     try {
       const docData = await getDoc(favRef);
-      console.log(docData.data())
       setFavouriteObj({...docData.data(),id:docData.id});
     } catch (error) {
       console.error("Error fetching favorites:", error);
@@ -67,8 +66,6 @@ function App() {
   }
 
   const userSignUp= (email,pass)=>{
-    console.log(email,pass)
-    
     createUserWithEmailAndPassword(auth,email,pass)
       .then((userCredential) => {
         setUserObj({email:email,id:userCredential.user.uid,error:''})
@@ -80,7 +77,6 @@ function App() {
       });
   }
   const userLogin=(email,pass)=>{
-    console.log(email)
     signInWithEmailAndPassword(auth, email, pass)
     .then((userCredential) => {
       setUserObj({email:email,id:userCredential.user.uid,error:''})
@@ -92,7 +88,7 @@ function App() {
   }
   
 
-  const [CoinCardArr, setCoinCardArr] = useState([])
+
   const [FavouriteObj, setFavouriteObj] = useState({})
   const [isLoggingIn,setIsLoggingIn]=useState(true)
   const toggleLogin=()=>{setIsLoggingIn(!isLoggingIn)}
@@ -106,22 +102,15 @@ function App() {
 
   useEffect(()=>{
 
-    function fetchAssetsData(){
-      fetch("https://api.coincap.io/v2/assets", requestOptions)
-        .then(response => response.json())
-        .then(data => {setCoinCardArr(data.data) })
-        .catch(error => console.error('Error:', error));
-    }
+    
     onAuthStateChanged(auth,(user) => {
       if (user) {
-        console.log(user.uid)
        setUserObj({email:user.email,id:user.uid,error:''})
       } else {
         console.log("not signed")
       }
     });
 
-    fetchAssetsData()
   },[])
   useEffect(()=>{if(favRef)fetchFav()},[userObj])
 
@@ -160,10 +149,10 @@ function App() {
       </NavBar>
         <Routes>
           <Route path='/' 
-          element={<GeneralPage cCardArr={CoinCardArr} changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}
+          element={<GeneralPage changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}
           />
           <Route path='/favourite' 
-          element={<FavouriteShow cCardArr={CoinCardArr} changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}
+          element={<FavouriteShow favArr={FavouriteArr} changeFav={changeFav} loggedIn={userId?true:false}/>}
           />
           <Route path='/search' element={<SearchID changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}>
             <Route path=':id' element={<SearchID changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>} />
