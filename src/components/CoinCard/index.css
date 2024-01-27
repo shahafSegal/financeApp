@@ -5,6 +5,7 @@
     background-color: black;
     color: gold;
     border: 4px solid gold;
+    padding: 7px;
 }
 .topTitle{
     display: flex;

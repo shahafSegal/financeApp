@@ -4,7 +4,7 @@ import "./index.css"
 import { Chart as ChartJS, CategoryScale,LinearScale,PointElement,LineElement,Title, Tooltip, Legend } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { requestOptions } from "../../../config/config";
-import {useEffect,useState} from "react";
+import {useEffect,useRef,useState} from "react";
 
 export default function CoinCard(props){
     ChartJS.register(
@@ -24,7 +24,7 @@ export default function CoinCard(props){
           },
           title: {
             display: true,
-            text: 'Chart.js Line Chart',
+            text: `${props.coin.id} price history`,
           },
         },
     };
@@ -35,8 +35,12 @@ export default function CoinCard(props){
     const isFav=props.isFav;
     const turnOffSearch=props.turnOffSearch;
     const[ChartData,setChartData]=useState([])
+    const[ShowExpand,setShowExpand]=useState(props.turnOffSearch)
+    const jumpRef=useRef(null)
 
-    async function getChart(){
+    const toggleExpand=()=>{setShowExpand(!ShowExpand);handleScroll()}
+
+    async function getChartData(){
         try{
             const response = await fetch(`https://api.coincap.io/v2/assets/${currCoin.id}/history?interval=d1`, requestOptions);
             const res =await response.json();
@@ -46,24 +50,30 @@ export default function CoinCard(props){
             console.log(e)
         }
     }
-    useEffect(()=>{if(turnOffSearch)getChart()},[currCoin.id])
+
     function getChartRender(){
-        return{
-            labels: ChartData.map((item) => {return item.date.substring(5, 10)}),
-            datasets: [
-              {
-                label: 'Price (USD)',
-                data: ChartData.map(item => parseFloat(item.priceUsd)),
-                fill: false,
-                borderColor: 'rgba(75, 192, 192, 1)',
-              }
-            ]
-          };
-    }
+      return{
+          labels: ChartData.map((item) => {return item.date.substring(5, 10)}),
+          datasets: [
+            {
+              label: 'Price (USD)',
+              data: ChartData.map(item => parseFloat(item.priceUsd)),
+              fill: false,
+              borderColor: 'rgba(75, 192, 192, 1)',
+            }
+          ]
+        };
+  }
+
+
+
+    useEffect(()=>{if(ShowExpand&&(ChartData.length==0))getChartData()},[currCoin.id,ShowExpand])
+
+   
 
     return(
     <div className="coinCard">
-        <div className="topTitle">
+        <div className="topTitle" ref={jumpRef}>
             <h2>{currCoin.rank}. {currCoin.name} </h2>
             <h3>{currCoin.symbol}</h3>
         </div>
@@ -76,8 +86,10 @@ export default function CoinCard(props){
             }
             {turnOffSearch?<></>:<NavLink to={`/search/${currCoin.id}`} className="btn btn-warning">To page</NavLink>}
         </div>
-        {ChartData?<Line options={options} data={getChartRender()} />:null}
-        
+
+        <button className="btn btn-primary"  onClick={toggleExpand}>{ShowExpand?"Hide History":"Show History"}</button>
+        {ChartData&&ShowExpand?<Line options={options} data={getChartRender()}/>:null}
+        <div></div>
         
     </div>
     )
