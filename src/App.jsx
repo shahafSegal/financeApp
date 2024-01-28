@@ -11,6 +11,7 @@ import FavouriteShow from './pages/FavouriteShow';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle"
 import SearchID from './pages/searchId';
+import ThemeProvider from './contexts/Theme';
 
 
 function App() {
@@ -143,23 +144,27 @@ function App() {
   return (
     
     <>
+    <ThemeProvider>
       <BrowserRouter>
       <NavBar usrObj={userObj} logOut={logOut}>
 
       </NavBar>
-        <Routes>
-          <Route path='/' 
-          element={<GeneralPage changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}
-          />
-          <Route path='/favourite' 
-          element={<FavouriteShow favArr={FavouriteArr} changeFav={changeFav} loggedIn={userId?true:false}/>}
-          />
-          <Route path='/search' element={<SearchID changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}>
-            <Route path=':id' element={<SearchID changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>} />
-          </Route>
-          <Route path='/register' element={<UserRegister usrSign={isLoggingIn?userLogin:userSignUp} usrObj={userObj} togle={toggleLogin} isLogin={isLoggingIn}/>}/>
-        </Routes>
+        
+          <Routes>
+            <Route path='/' 
+            element={<GeneralPage changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}
+            />
+            <Route path='/favourite' 
+            element={<FavouriteShow favArr={FavouriteArr} changeFav={changeFav} loggedIn={userId?true:false}/>}
+            />
+            <Route path='/search' element={<SearchID changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>}>
+              <Route path=':id' element={<SearchID changeFav={changeFav} isFavFunc={isIdFav} loggedIn={userId?true:false}/>} />
+            </Route>
+            <Route path='/register' element={<UserRegister usrSign={isLoggingIn?userLogin:userSignUp} usrObj={userObj} togle={toggleLogin} isLogin={isLoggingIn}/>}/>
+          </Routes>
+       
       </BrowserRouter>
+      </ThemeProvider>
       
     </>
     

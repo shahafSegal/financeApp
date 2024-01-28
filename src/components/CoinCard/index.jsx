@@ -4,7 +4,8 @@ import "./index.css"
 import { Chart as ChartJS, CategoryScale,LinearScale,PointElement,LineElement,Title, Tooltip, Legend } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { requestOptions } from "../../../config/config";
-import {useEffect,useRef,useState} from "react";
+import {useContext, useEffect,useRef,useState} from "react";
+import { ThemeContext } from "../../contexts/Theme";
 
 export default function CoinCard(props){
     ChartJS.register(
@@ -69,12 +70,12 @@ export default function CoinCard(props){
 
     useEffect(()=>{if(ShowExpand&&(ChartData.length==0))getChartData()},[currCoin.id,ShowExpand])
 
-   
+    const {currStyle}=useContext(ThemeContext) 
 
     return(
     <div className="coinCard">
         <div className="topTitle" ref={jumpRef}>
-            <h2>{currCoin.rank}. {currCoin.name} </h2>
+            <h2 style={{...currStyle}}>{currCoin.rank}. {currCoin.name} </h2>
             <h3>{currCoin.symbol}</h3>
         </div>
        

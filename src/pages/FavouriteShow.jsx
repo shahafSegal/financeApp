@@ -24,7 +24,7 @@ export default function FavouriteShow(props)  {
     ,[favArr])
     
     function createCoinCards(){
-        return FavouriteData.map((newCoin)=>{return <CoinCard 
+        return FavouriteData.map((newCoin)=>{return <CoinCard key={newCoin.id}
         coin={newCoin} changeFav={props.changeFav} isFav={true} loggedIn={props.loggedIn}>
         </CoinCard>
         })
